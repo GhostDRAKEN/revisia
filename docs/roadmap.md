@@ -7,7 +7,9 @@
 
 ## Statut actuel
 
-🟡 **Phase 1 — Structuration** (en cours)
+
+✅ **Phase 1 — Structuration** (terminée)
+🟡 **Phase 2 — Backend Core** (à venir)
 
 ---
 
