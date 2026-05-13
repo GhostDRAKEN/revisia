@@ -105,9 +105,25 @@ L'IA analyse le contenu et génère automatiquement :
 - Compatible Android en priorité (iOS en V2)
 - Respect des données utilisateurs (aucune revente)
 
+
 ---
 
-## 9. Objectifs du projet
+## 9. Conformité et protection des données
+
+Le projet respecte le Code du Numérique du Bénin (Loi n° 2017-20) :
+
+- Collecte minimale des données utilisateurs
+- Fichiers PDF supprimés après traitement
+- Mots de passe hashés, jamais stockés en clair
+- HTTPS obligatoire en production
+- Politique de confidentialité documentée
+- Consentement utilisateur intégré à l'inscription
+
+
+---
+
+
+## 10. Objectifs du projet
 
 ### Techniques
 - Maîtriser une architecture client/serveur moderne
@@ -121,7 +137,7 @@ L'IA analyse le contenu et génère automatiquement :
 
 ---
 
-## 10. Ce que le projet n'est PAS
+## 11. Ce que le projet n'est PAS
 
 - Pas un clone de ChatGPT
 - Pas une plateforme e-learning complète
