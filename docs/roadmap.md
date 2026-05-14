@@ -9,7 +9,8 @@
 
 
 ✅ **Phase 1 — Structuration** (terminée)
-🟡 **Phase 2 — Backend Core** (à venir)
+✅ **Phase 2 — Backend Core** (terminée)
+🟡 **Phase 3 — Flutter MVP** (à venir)
 
 ---
 
