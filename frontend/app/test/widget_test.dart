@@ -8,6 +8,6 @@ void main() {
     await tester.pumpWidget(const RevisiaApp());
 
     expect(find.text('Revisia'), findsOneWidget);
-    expect(find.text('Révision intelligente'), findsOneWidget);
+    expect(find.text("L'IA qui révise avec toi"), findsOneWidget);
   });
 }
