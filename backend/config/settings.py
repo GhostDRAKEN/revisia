@@ -24,11 +24,14 @@ INSTALLED_APPS = [
     # Packages tiers
     'rest_framework',
     'corsheaders',
+    'rest_framework_simplejwt.token_blacklist',
 
     # Apps Revisia
     'apps.users',
     'apps.documents',
     'apps.generation',
+   
+    
 ]
 
 MIDDLEWARE = [
@@ -119,3 +122,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Groq
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+# Modèle utilisateur custom
+AUTH_USER_MODEL = 'users.User'
