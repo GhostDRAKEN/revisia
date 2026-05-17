@@ -1,17 +1,15 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/constants/api_constants.dart';
 import '../models/document_model.dart';
 import 'auth_service.dart';
 
 class DocumentService {
-  DocumentService({Dio? dio, FlutterSecureStorage? storage})
-    : _dio = dio ?? Dio(BaseOptions(baseUrl: ApiConstants.baseUrl)),
-      _storage = storage ?? const FlutterSecureStorage();
+  DocumentService({Dio? dio})
+      : _dio = dio ?? Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
 
   final Dio _dio;
-  final FlutterSecureStorage _storage;
 
   Future<DocumentModel> uploadPdf({
     required String filePath,
@@ -36,7 +34,6 @@ class DocumentService {
       );
 
       final json = response.data;
-
       if (json == null || json['success'] != true) {
         throw const ApiException('Une erreur est survenue, réessayez');
       }
@@ -48,8 +45,8 @@ class DocumentService {
   }
 
   Future<String> _requireToken() async {
-    final token = await _storage.read(key: ApiConstants.tokenKey);
-
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(ApiConstants.tokenKey);
     if (token == null || token.isEmpty) {
       throw const ApiException(
         'Authentification requise',
@@ -57,7 +54,6 @@ class DocumentService {
         statusCode: 401,
       );
     }
-
     return token;
   }
 }

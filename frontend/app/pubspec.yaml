@@ -34,11 +34,11 @@ dependencies:
   # HTTP
   dio: ^5.7.0
   
-  # Stockage sécurisé (token JWT)
-  flutter_secure_storage: ^9.2.2
-  
+ 
+  # Stockage local (token JWT)
+  shared_preferences: ^2.3.2
   # Sélection de fichiers
-  file_picker: ^8.1.2
+  file_picker: ^8.0.0+1
   
   # Gestion d'état
   provider: ^6.1.2

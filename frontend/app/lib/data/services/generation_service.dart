@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/constants/api_constants.dart';
 import '../models/quiz_model.dart';
@@ -7,12 +7,10 @@ import '../models/summary_model.dart';
 import 'auth_service.dart';
 
 class GenerationService {
-  GenerationService({Dio? dio, FlutterSecureStorage? storage})
-    : _dio = dio ?? Dio(BaseOptions(baseUrl: ApiConstants.baseUrl)),
-      _storage = storage ?? const FlutterSecureStorage();
+  GenerationService({Dio? dio})
+      : _dio = dio ?? Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
 
   final Dio _dio;
-  final FlutterSecureStorage _storage;
 
   Future<QuizModel> generateQuiz({
     required String documentId,
@@ -23,11 +21,10 @@ class GenerationService {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiConstants.generateQuiz,
         data: {'document_id': documentId, 'question_count': questionCount},
-        options: Options(headers: _authHeaders(token)),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
       final json = response.data;
-
       if (json == null || json['success'] != true) {
         throw const ApiException('Erreur de génération, réessayez');
       }
@@ -44,11 +41,10 @@ class GenerationService {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiConstants.generateSummary,
         data: {'document_id': documentId},
-        options: Options(headers: _authHeaders(token)),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
       final json = response.data;
-
       if (json == null || json['success'] != true) {
         throw const ApiException('Erreur de génération, réessayez');
       }
@@ -60,8 +56,8 @@ class GenerationService {
   }
 
   Future<String> _requireToken() async {
-    final token = await _storage.read(key: ApiConstants.tokenKey);
-
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(ApiConstants.tokenKey);
     if (token == null || token.isEmpty) {
       throw const ApiException(
         'Authentification requise',
@@ -69,11 +65,6 @@ class GenerationService {
         statusCode: 401,
       );
     }
-
     return token;
-  }
-
-  Map<String, String> _authHeaders(String token) {
-    return {'Authorization': 'Bearer $token'};
   }
 }
