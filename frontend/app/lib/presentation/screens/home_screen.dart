@@ -47,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('Revisia'),
         actions: [
@@ -59,82 +60,108 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Icon(Icons.logout),
+                : const Icon(Icons.logout_rounded),
           ),
         ],
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                firstName == null ? 'Bienvenue' : 'Bienvenue, $firstName',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: AppTheme.textColor,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text("L'IA qui révise avec toi"),
-              if (_errorMessage != null) ...[
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: AppTheme.softBackgroundGradient,
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 const SizedBox(height: 12),
-                Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+                Text(
+                  firstName == null
+                      ? 'Prêt à réviser plus vite ?'
+                      : 'Bienvenue, $firstName',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: AppTheme.textColor,
+                    letterSpacing: 0,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Transforme tes cours en résumés et quiz avec l'IA.",
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppTheme.mutedTextColor,
+                    height: 1.35,
+                  ),
+                ),
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ],
+                const Spacer(),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: AppTheme.premiumCardDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Colors.white, Color(0xFFEFF6FF)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderColor: Colors.white,
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 88,
+                        height: 88,
+                        decoration: BoxDecoration(
+                          gradient: AppTheme.primaryGradient,
+                          shape: BoxShape.circle,
+                          boxShadow: AppTheme.softShadow,
+                        ),
+                        child: const Icon(
+                          Icons.upload_file_rounded,
+                          color: Colors.white,
+                          size: 42,
+                        ),
+                      ),
+                      const SizedBox(height: 22),
+                      Text(
+                        'Importer un cours',
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.w900),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Ajoute un PDF, puis génère un résumé clair et un quiz ciblé en quelques instants.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppTheme.mutedTextColor,
+                          height: 1.45,
+                        ),
+                      ),
+                      const SizedBox(height: 26),
+                      GradientButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const UploadScreen(),
+                            ),
+                          );
+                        },
+                        child: const Text('Commencer'),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
               ],
-              const Spacer(),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.upload_file,
-                        color: AppTheme.primaryColor,
-                        size: 36,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Importer un cours',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Ajoute un PDF, puis génère un résumé et un quiz en quelques instants.',
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const UploadScreen(),
-                          ),
-                        );
-                      },
-                      child: const Text('Commencer'),
-                    ),
-                  ],
-                ),
-              ),
-              const Spacer(),
-            ],
+            ),
           ),
         ),
       ),

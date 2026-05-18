@@ -59,69 +59,128 @@ class _SummaryScreenState extends State<SummaryScreen> {
       appBar: AppBar(title: Text(widget.summary.title)),
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.all(24),
-        child: ElevatedButton(
+        child: GradientButton(
           onPressed: _isGeneratingQuiz ? null : _generateQuiz,
-          child: _isGeneratingQuiz
-              ? const Text('Génération en cours...')
-              : const Text('Générer un quiz'),
+          isLoading: _isGeneratingQuiz,
+          child: const Text('Générer un quiz'),
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Points clés',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: widget.summary.keyPoints
-                    .map(
-                      (point) => Chip(
-                        label: Text(point),
-                        backgroundColor: AppTheme.secondaryColor.withValues(
-                          alpha: 0.1,
-                        ),
-                        side: BorderSide.none,
-                      ),
-                    )
-                    .toList(),
-              ),
-              const SizedBox(height: 28),
-              Text(
-                'Résumé complet',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: AppTheme.softBackgroundGradient,
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Points clés',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
                 ),
-                child: Text(
-                  widget.summary.fullSummary,
-                  style: const TextStyle(height: 1.5),
+                const SizedBox(height: 14),
+                ...widget.summary.keyPoints.asMap().entries.map(
+                  (entry) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _KeyPointCard(
+                      number: entry.key + 1,
+                      text: entry.value,
+                    ),
+                  ),
                 ),
-              ),
-              if (_errorMessage != null) ...[
-                const SizedBox(height: 16),
-                Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+                const SizedBox(height: 20),
+                Text(
+                  'Résumé complet',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+                ),
+                const SizedBox(height: 14),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(22),
+                  decoration: AppTheme.premiumCardDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Colors.white, Color(0xFFF8FAFC)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderColor: Colors.white,
+                  ),
+                  child: Text(
+                    widget.summary.fullSummary,
+                    style: const TextStyle(height: 1.58, fontSize: 15),
+                  ),
+                ),
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _KeyPointCard extends StatelessWidget {
+  const _KeyPointCard({required this.number, required this.text});
+
+  final int number;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: AppTheme.premiumCardDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFF0FDFA), Colors.white],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderColor: Colors.white,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: const BoxDecoration(
+              gradient: AppTheme.primaryGradient,
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              '$number',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: AppTheme.textColor,
+                height: 1.4,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

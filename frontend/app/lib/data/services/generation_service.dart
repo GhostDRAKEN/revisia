@@ -8,7 +8,7 @@ import 'auth_service.dart';
 
 class GenerationService {
   GenerationService({Dio? dio})
-      : _dio = dio ?? Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
+    : _dio = dio ?? Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
 
   final Dio _dio;
 

@@ -83,53 +83,74 @@ class _ResultScreenState extends State<ResultScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Résultat')),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.document.title,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  _StatChip(
-                    icon: Icons.description_outlined,
-                    label: '${widget.document.pageCount} pages',
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: AppTheme.softBackgroundGradient,
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.document.title,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: AppTheme.textColor,
                   ),
-                  const SizedBox(width: 8),
-                  _StatChip(
-                    icon: Icons.notes_outlined,
-                    label: '${widget.document.wordCount} mots',
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    _StatChip(
+                      icon: Icons.description_rounded,
+                      label: '${widget.document.pageCount} pages',
+                    ),
+                    const SizedBox(width: 8),
+                    _StatChip(
+                      icon: Icons.notes_rounded,
+                      label: '${widget.document.wordCount} mots',
+                    ),
+                  ],
+                ),
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
                   ),
                 ],
-              ),
-              if (_errorMessage != null) ...[
-                const SizedBox(height: 16),
-                Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+                const SizedBox(height: 30),
+                _ActionCard(
+                  title: 'Résumé',
+                  description: 'Points clés, idées fortes et synthèse claire.',
+                  icon: Icons.auto_stories_rounded,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFEFF6FF), Colors.white],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  iconColor: AppTheme.primaryColor,
+                  isLoading: _isGeneratingSummary,
+                  onTap: isBusy ? null : _generateSummary,
+                ),
+                const SizedBox(height: 18),
+                _ActionCard(
+                  title: 'Quiz',
+                  description: 'Questions ciblées avec corrections immédiates.',
+                  icon: Icons.quiz_rounded,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFF0FDFA), Colors.white],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  iconColor: AppTheme.secondaryColor,
+                  isLoading: _isGeneratingQuiz,
+                  onTap: isBusy ? null : _generateQuiz,
+                ),
               ],
-              const SizedBox(height: 28),
-              _ActionCard(
-                title: 'Résumé',
-                description: 'Obtiens les points clés et un résumé structuré.',
-                icon: Icons.summarize_outlined,
-                isLoading: _isGeneratingSummary,
-                onTap: isBusy ? null : _generateSummary,
-              ),
-              const SizedBox(height: 16),
-              _ActionCard(
-                title: 'Quiz',
-                description: 'Teste ta compréhension avec des QCM corrigés.',
-                icon: Icons.quiz_outlined,
-                isLoading: _isGeneratingQuiz,
-                onTap: isBusy ? null : _generateQuiz,
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -145,11 +166,22 @@ class _StatChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Chip(
-      avatar: Icon(icon, size: 18),
-      label: Text(label),
-      backgroundColor: Colors.white,
-      side: const BorderSide(color: Color(0xFFE5E7EB)),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppTheme.borderColor),
+        boxShadow: AppTheme.cardShadow,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18, color: AppTheme.primaryColor),
+          const SizedBox(width: 6),
+          Text(label),
+        ],
+      ),
     );
   }
 }
@@ -159,6 +191,8 @@ class _ActionCard extends StatelessWidget {
     required this.title,
     required this.description,
     required this.icon,
+    required this.gradient,
+    required this.iconColor,
     required this.isLoading,
     required this.onTap,
   });
@@ -166,6 +200,8 @@ class _ActionCard extends StatelessWidget {
   final String title;
   final String description;
   final IconData icon;
+  final Gradient gradient;
+  final Color iconColor;
   final bool isLoading;
   final VoidCallback? onTap;
 
@@ -173,18 +209,25 @@ class _ActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+        decoration: AppTheme.premiumCardDecoration(
+          gradient: gradient,
+          borderColor: Colors.white,
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppTheme.primaryColor, size: 34),
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(icon, color: iconColor, size: 30),
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -194,22 +237,28 @@ class _ActionCard extends StatelessWidget {
                     title,
                     style: const TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(description),
+                  const SizedBox(height: 6),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      color: AppTheme.mutedTextColor,
+                      height: 1.35,
+                    ),
+                  ),
                 ],
               ),
             ),
             if (isLoading)
               const SizedBox(
-                height: 22,
-                width: 22,
+                height: 24,
+                width: 24,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             else
-              const Icon(Icons.chevron_right),
+              Icon(Icons.chevron_right_rounded, color: iconColor, size: 30),
           ],
         ),
       ),

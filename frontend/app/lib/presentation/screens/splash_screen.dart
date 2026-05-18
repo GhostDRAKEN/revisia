@@ -15,18 +15,37 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   Timer? _redirectTimer;
+  late final AnimationController _animationController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.16), end: Offset.zero).animate(
+          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+        );
+
+    _animationController.forward();
     _redirectTimer = Timer(const Duration(seconds: 2), _redirect);
   }
 
   @override
   void dispose() {
     _redirectTimer?.cancel();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -46,26 +65,56 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    return Scaffold(
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: AppTheme.softBackgroundGradient,
+        ),
+        child: Stack(
           children: [
-            _RevisiaLogo(size: 88, fontSize: 42),
-            SizedBox(height: 24),
-            Text(
-              'Revisia',
-              style: TextStyle(
-                color: AppTheme.textColor,
-                fontSize: 34,
-                fontWeight: FontWeight.w800,
-              ),
+            // Cercles très doux pour donner de la profondeur au fond.
+            const Positioned(
+              top: -80,
+              right: -60,
+              child: _SoftGlow(size: 190, color: AppTheme.primaryColor),
             ),
-            SizedBox(height: 8),
-            Text(
-              "L'IA qui révise avec toi",
-              style: TextStyle(color: Colors.black54, fontSize: 14),
+            const Positioned(
+              bottom: -90,
+              left: -70,
+              child: _SoftGlow(size: 210, color: AppTheme.secondaryColor),
+            ),
+            Center(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: const Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _RevisiaLogo(size: 96, fontSize: 46),
+                      SizedBox(height: 26),
+                      Text(
+                        'Revisia',
+                        style: TextStyle(
+                          color: AppTheme.textColor,
+                          fontSize: 38,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "L'IA qui révise avec toi",
+                        style: TextStyle(
+                          color: AppTheme.mutedTextColor,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -85,9 +134,10 @@ class _RevisiaLogo extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: const BoxDecoration(
-        color: AppTheme.primaryColor,
+      decoration: BoxDecoration(
+        gradient: AppTheme.primaryGradient,
         shape: BoxShape.circle,
+        boxShadow: AppTheme.softShadow,
       ),
       alignment: Alignment.center,
       child: Text(
@@ -97,6 +147,25 @@ class _RevisiaLogo extends StatelessWidget {
           fontSize: fontSize,
           fontWeight: FontWeight.w900,
         ),
+      ),
+    );
+  }
+}
+
+class _SoftGlow extends StatelessWidget {
+  const _SoftGlow({required this.size, required this.color});
+
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color.withValues(alpha: 0.10),
       ),
     );
   }

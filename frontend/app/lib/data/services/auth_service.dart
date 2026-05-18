@@ -30,7 +30,7 @@ class AuthResult {
 
 class AuthService extends ChangeNotifier {
   AuthService({Dio? dio})
-      : _dio = dio ?? Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
+    : _dio = dio ?? Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
 
   final Dio _dio;
 
@@ -95,9 +95,7 @@ class AuthService extends ChangeNotifier {
       if (storedToken != null) {
         await _dio.post<Map<String, dynamic>>(
           ApiConstants.logout,
-          options: Options(
-            headers: {'Authorization': 'Bearer $storedToken'},
-          ),
+          options: Options(headers: {'Authorization': 'Bearer $storedToken'}),
         );
       }
     } on DioException catch (error) {

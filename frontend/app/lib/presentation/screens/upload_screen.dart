@@ -78,72 +78,135 @@ class _UploadScreenState extends State<UploadScreen> {
   @override
   Widget build(BuildContext context) {
     final file = _selectedFile;
+    final hasFile = file != null;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Importer un cours')),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              InkWell(
-                onTap: _isUploading ? null : _pickFile,
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: file == null
-                          ? const Color(0xFFD1D5DB)
-                          : AppTheme.primaryColor,
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: AppTheme.softBackgroundGradient,
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AnimatedScale(
+                  scale: hasFile ? 1.02 : 1,
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOut,
+                  child: InkWell(
+                    onTap: _isUploading ? null : _pickFile,
+                    borderRadius: BorderRadius.circular(20),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 240),
+                      padding: const EdgeInsets.all(24),
+                      decoration: AppTheme.premiumCardDecoration(
+                        gradient: hasFile
+                            ? const LinearGradient(
+                                colors: [Colors.white, Color(0xFFEFFDF9)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              )
+                            : const LinearGradient(
+                                colors: [Colors.white, Color(0xFFEFF6FF)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                        borderColor: hasFile
+                            ? AppTheme.secondaryColor
+                            : Colors.white,
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 78,
+                            height: 78,
+                            decoration: BoxDecoration(
+                              gradient: hasFile
+                                  ? const LinearGradient(
+                                      colors: [
+                                        AppTheme.secondaryColor,
+                                        Color(0xFF34D399),
+                                      ],
+                                    )
+                                  : AppTheme.primaryGradient,
+                              shape: BoxShape.circle,
+                              boxShadow: AppTheme.softShadow,
+                            ),
+                            child: Icon(
+                              hasFile
+                                  ? Icons.check_rounded
+                                  : Icons.picture_as_pdf_rounded,
+                              color: Colors.white,
+                              size: 38,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Text(
+                            file?.name ?? 'Sélectionner un fichier PDF',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w900),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            hasFile
+                                ? _formatSize(file.size)
+                                : 'PDF uniquement, jusqu’à 10 MB',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: AppTheme.mutedTextColor,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        file == null
-                            ? Icons.picture_as_pdf_outlined
-                            : Icons.check_circle_outline,
-                        color: file == null
-                            ? Colors.black45
-                            : AppTheme.secondaryColor,
-                        size: 48,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        file?.name ?? 'Sélectionner un fichier PDF',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                      if (file != null) ...[
-                        const SizedBox(height: 6),
-                        Text(_formatSize(file.size)),
+                ),
+                if (_isUploading) ...[
+                  const SizedBox(height: 28),
+                  Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: AppTheme.premiumCardDecoration(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Analyse du document',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: 12),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(999),
+                          child: LinearProgressIndicator(
+                            value: _progress == 0 ? null : _progress,
+                            minHeight: 10,
+                            color: AppTheme.primaryColor,
+                            backgroundColor: const Color(0xFFE0E7FF),
+                          ),
+                        ),
                       ],
-                    ],
+                    ),
                   ),
-                ),
-              ),
-              if (_isUploading) ...[
-                const SizedBox(height: 24),
-                LinearProgressIndicator(
-                  value: _progress == 0 ? null : _progress,
+                ],
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ],
+                const Spacer(),
+                GradientButton(
+                  onPressed: hasFile && !_isUploading ? _upload : null,
+                  isLoading: _isUploading,
+                  child: const Text('Analyser'),
                 ),
               ],
-              if (_errorMessage != null) ...[
-                const SizedBox(height: 16),
-                Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
-              ],
-              const Spacer(),
-              ElevatedButton(
-                onPressed: file == null || _isUploading ? null : _upload,
-                child: _isUploading
-                    ? const Text('Analyse en cours...')
-                    : const Text('Analyser'),
-              ),
-            ],
+            ),
           ),
         ),
       ),
